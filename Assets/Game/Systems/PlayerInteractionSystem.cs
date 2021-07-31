@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using SystemsRx.Events;
 using SystemsRx.Extensions;
 using SystemsRx.Systems.Conventional;
-using EcsRx.Collections;
 using EcsRx.Entities;
 using EcsRx.Groups;
 using EcsRx.Groups.Observable;
@@ -28,6 +27,7 @@ namespace Game.Systems
         
         private readonly IList<IDisposable> _foodTriggers = new List<IDisposable>();
         private readonly IList<IDisposable> _exitTriggers = new List<IDisposable>();
+        private readonly IList<IDisposable> _coinTriggers = new List<IDisposable>();
         private readonly IEventSystem _eventSystem;
 
         public PlayerInteractionSystem(IEventSystem eventSystem)
@@ -48,6 +48,7 @@ namespace Game.Systems
         {
             _foodTriggers.DisposeAll();
             _exitTriggers.DisposeAll();
+            _coinTriggers.DisposeAll();
         }
 
         private void CheckForInteractions(IEntity player)
@@ -76,6 +77,16 @@ namespace Game.Systems
                 });
 
             _exitTriggers.Add(exitTrigger);
+
+            var coinTrigger = triggerObservable
+                .Where(x => x.gameObject.CompareTag("Coin"))
+                .Subscribe(x =>
+                {
+                    var entityView = x.gameObject.GetComponent<EntityView>();
+                    HandleCoins(entityView.Entity, currentPlayer);
+                });
+
+            _coinTriggers.Add(coinTrigger);
         }
 
         private void HandleFoodPickup(IEntity food, IEntity player, bool isSoda)
@@ -83,5 +94,8 @@ namespace Game.Systems
 
         private void HandleExit(IEntity exit, IEntity player)
         { _eventSystem.Publish(new ExitReachedEvent(exit, player)); }
+
+        private void HandleCoins(IEntity coin, IEntity player)
+        { _eventSystem.Publish(new EntityCollisionEvent("Coin", coin, player)); }
     }
 }
