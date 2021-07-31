@@ -66,8 +66,6 @@ namespace Game
                     playerComponent.Food.Value = _gameConfiguration.StartingFoodPoints;
                     SetupLevel(levelComponent);
                 });
-
-            SetupCollisions();
         }
 
         private void SetupLevel(LevelComponent levelComponent)
@@ -100,12 +98,6 @@ namespace Game
             { defaultCollection.CreateEntity(new CoinBlueprint()); }
 
             defaultCollection.CreateEntity(new ExitBlueprint());
-        }
-
-        private void SetupCollisions()
-        {
-            Container.Resolve<EntityCollisionListener>();
-            Container.ResolveAll<CollisionHander>();
         }
     }
 }
