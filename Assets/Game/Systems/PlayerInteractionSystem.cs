@@ -25,9 +25,7 @@ namespace Game.Systems
         [FromGroup]
         public IObservableGroup ObservableGroup;
         
-        private readonly IList<IDisposable> _foodTriggers = new List<IDisposable>();
-        private readonly IList<IDisposable> _exitTriggers = new List<IDisposable>();
-        private readonly IList<IDisposable> _coinTriggers = new List<IDisposable>();
+        private readonly IList<IDisposable> _interactionTriggers = new List<IDisposable>();
         private readonly IEventSystem _eventSystem;
 
         public PlayerInteractionSystem(IEventSystem eventSystem)
@@ -46,9 +44,7 @@ namespace Game.Systems
 
         public void StopSystem()
         {
-            _foodTriggers.DisposeAll();
-            _exitTriggers.DisposeAll();
-            _coinTriggers.DisposeAll();
+            _interactionTriggers.DisposeAll();
         }
 
         private void CheckForInteractions(IEntity player)
@@ -56,46 +52,16 @@ namespace Game.Systems
             var currentPlayer = player;
             var playerView = currentPlayer.GetGameObject();
             var triggerObservable = playerView.OnTriggerEnter2DAsObservable();
-            
-            var foodTrigger = triggerObservable
-                .Where(x => x.gameObject.CompareTag("Food") || x.gameObject.CompareTag("Soda"))
-                .Subscribe(x =>
-                {
-                    var entityView = x.gameObject.GetComponent<EntityView>();
-                    var isSoda = x.gameObject.CompareTag("Soda");
-                    HandleFoodPickup(entityView.Entity, currentPlayer, isSoda);
-                });
 
-            _foodTriggers.Add(foodTrigger);
+            var triggers = triggerObservable.Subscribe(x =>
+            {
+                var tag = x.gameObject.tag;
+                var entityView = x.gameObject.GetComponent<EntityView>();
 
-            var exitTrigger = triggerObservable
-                .Where(x => x.gameObject.CompareTag("Exit"))
-                .Subscribe(x =>
-                {
-                    var entityView = x.gameObject.GetComponent<EntityView>();
-                    HandleExit(entityView.Entity, currentPlayer);
-                });
+                _eventSystem.Publish(new EntityCollisionEvent(tag, entityView.Entity, currentPlayer));
+            });
 
-            _exitTriggers.Add(exitTrigger);
-
-            var coinTrigger = triggerObservable
-                .Where(x => x.gameObject.CompareTag("Coin"))
-                .Subscribe(x =>
-                {
-                    var entityView = x.gameObject.GetComponent<EntityView>();
-                    HandleCoins(entityView.Entity, currentPlayer);
-                });
-
-            _coinTriggers.Add(coinTrigger);
+            _interactionTriggers.Add(triggers);
         }
-
-        private void HandleFoodPickup(IEntity food, IEntity player, bool isSoda)
-        { _eventSystem.Publish(new FoodPickupEvent(food, player, isSoda)); }
-
-        private void HandleExit(IEntity exit, IEntity player)
-        { _eventSystem.Publish(new ExitReachedEvent(exit, player)); }
-
-        private void HandleCoins(IEntity coin, IEntity player)
-        { _eventSystem.Publish(new EntityCollisionEvent("Coin", coin, player)); }
     }
 }
