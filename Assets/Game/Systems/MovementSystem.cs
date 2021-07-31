@@ -19,11 +19,11 @@ namespace Game.Systems
     public class MovementSystem : IReactToEntitySystem
     {
         private readonly LayerMask _blockingLayer = LayerMask.GetMask("BlockingLayer");
-        
+
         private readonly GameConfiguration _gameConfiguration;
         private readonly IEventSystem _eventSystem;
-        
-        public IGroup Group { get; } = new Group(typeof(ViewComponent), typeof(MovementComponent)); 
+
+        public IGroup Group { get; } = new Group(typeof(ViewComponent), typeof(MovementComponent));
 
         public MovementSystem(GameConfiguration gameConfiguration, IEventSystem eventSystem)
         {
@@ -54,17 +54,11 @@ namespace Game.Systems
                 movementComponent.Movement.Value = Vector2.zero;
 
                 var entityView = collidedObject.GetComponent<EntityView>();
-                if(!entityView) { return; }
+                if (!entityView) { return; }
 
-                if (isPlayer && collidedObject.tag.Contains("Wall"))
-                { WallHit(entityView.Entity, entity); }
+                //New collision
+                _eventSystem.Publish(new EntityCollisionEvent(collidedObject.tag, entityView.Entity, entity));
 
-                if (isPlayer && collidedObject.tag.Contains("Enemy"))
-                { EnemyHit(entityView.Entity, entity); }
-
-                if(!isPlayer && collidedObject.tag.Contains("Player"))
-                { PlayerHit(entityView.Entity, entity); }
-                
                 return;
             }
 
@@ -86,7 +80,7 @@ namespace Game.Systems
             var hit = Physics2D.Linecast(start, destination, _blockingLayer);
             boxCollider.enabled = true;
 
-            if(!hit.collider) { return null; }
+            if (!hit.collider) { return null; }
             return hit.collider.gameObject;
         }
 
@@ -106,25 +100,10 @@ namespace Game.Systems
                 yield return null;
             }
 
-            if(mover != null)
+            if (mover != null)
             { mover.transform.position = destination; }
 
             movementComponent.Movement.Value = Vector2.zero;
-        }
-
-        private void WallHit(IEntity wall, IEntity player)
-        {
-            _eventSystem.Publish(new WallHitEvent(wall, player));
-        }
-
-        private void PlayerHit(IEntity player, IEntity enemy)
-        {
-            _eventSystem.Publish(new PlayerHitEvent(player, enemy));
-        }
-
-        private void EnemyHit(IEntity enemy, IEntity player)
-        {
-            _eventSystem.Publish(new EnemyHitEvent(enemy, player));
         }
     }
 }

@@ -13,6 +13,8 @@ using Game.Installers;
 using UniRx;
 using UnityEngine;
 using Zenject;
+using Game.Services;
+using Game.Handlers.Collision;
 
 namespace Game
 {
@@ -64,6 +66,8 @@ namespace Game
                     playerComponent.Food.Value = _gameConfiguration.StartingFoodPoints;
                     SetupLevel(levelComponent);
                 });
+
+            SetupCollisions();
         }
 
         private void SetupLevel(LevelComponent levelComponent)
@@ -90,6 +94,12 @@ namespace Game
             { defaultCollection.CreateEntity(new EnemyBlueprint()); }
 
             defaultCollection.CreateEntity(new ExitBlueprint());
+        }
+
+        private void SetupCollisions()
+        {
+            Container.Resolve<EntityCollisionListener>();
+            Container.ResolveAll<CollisionHander>();
         }
     }
 }
