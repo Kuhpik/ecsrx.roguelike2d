@@ -3,13 +3,14 @@ using EcsRx.Extensions;
 using Game.Components;
 using Game.Events;
 using Game.Services;
+using System.Collections.Generic;
 using SystemsRx.Events;
 
 namespace Game.Handlers.Collision
 {
     public class WallCollisionHandler : CollisionHander
     {
-        public override string Tag => "Wall";
+        protected override List<string> _tags => new List<string>() { "Wall" };
 
         public WallCollisionHandler(IEventSystem eventSystem, EntityCollisionListener collisionListener)
             : base(eventSystem, collisionListener) { }

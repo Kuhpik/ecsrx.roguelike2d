@@ -3,13 +3,14 @@ using EcsRx.Extensions;
 using Game.Components;
 using Game.Events;
 using Game.Services;
+using System.Collections.Generic;
 using SystemsRx.Events;
 
 namespace Game.Handlers.Collision
 {
     public class CoinCollisionHandler : CollisionHander
     {
-        public override string Tag => "Coin";
+        protected override List<string> _tags => new List<string>() { "Coin" };
 
         public CoinCollisionHandler(IEventSystem eventSystem, EntityCollisionListener collisionListener)
             : base(eventSystem, collisionListener) { }

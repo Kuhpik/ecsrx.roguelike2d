@@ -31,10 +31,13 @@ namespace Game.Services
 
         public void Subscribe(CollisionHander handler)
         {
-            if (!_collisionHandlers.ContainsKey(handler.Tag))
+            foreach (var tag in handler.Tags)
             {
-                _collisionHandlers.Add(handler.Tag, handler);
-            }
+                if (!_collisionHandlers.ContainsKey(tag))
+                {
+                    _collisionHandlers.Add(tag, handler);
+                }
+            }            
         }
     }
 }

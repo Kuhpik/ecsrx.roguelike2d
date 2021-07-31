@@ -1,13 +1,14 @@
 ﻿using EcsRx.Entities;
 using Game.Events;
 using Game.Services;
+using System.Collections.Generic;
 using SystemsRx.Events;
 
 namespace Game.Handlers.Collision
 {
     public class PlayerCollisionHandler : CollisionHander
     {
-        public override string Tag => "Player";
+        protected override List<string> _tags => new List<string>() { "Player" };
 
         public PlayerCollisionHandler(IEventSystem eventSystem, EntityCollisionListener collisionListener)
             : base(eventSystem, collisionListener) { }
