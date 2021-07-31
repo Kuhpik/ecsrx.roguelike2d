@@ -14,6 +14,7 @@ namespace Game.Installers
             container.Bind<FoodTiles>(new BindingConfiguration{AsSingleton = true});
             container.Bind<EnemyTiles>(new BindingConfiguration{AsSingleton = true});
             container.Bind<ExitTiles>(new BindingConfiguration{AsSingleton = true});
+            container.Bind<CoinTiles>(new BindingConfiguration{AsSingleton = true});
         }
 
         private void SetupAudio(IDependencyContainer container)

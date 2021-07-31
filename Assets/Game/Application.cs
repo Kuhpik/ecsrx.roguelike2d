@@ -24,7 +24,7 @@ namespace Game
 
         [Inject]
         private GameConfiguration _gameConfiguration;
-        
+
         protected override void LoadModules()
         {
             base.LoadModules();
@@ -74,14 +74,17 @@ namespace Game
         {
             levelComponent.HasLoaded.Value = false;
 
-            defaultCollection.RemoveEntitiesContaining(typeof(GameBoardComponent),
-                typeof(FoodComponent), typeof(WallComponent),
-                typeof(EnemyComponent), typeof(ExitComponent));
+            defaultCollection.RemoveEntitiesContaining
+            (
+                typeof(GameBoardComponent), typeof(FoodComponent), typeof(WallComponent),
+                typeof(EnemyComponent), typeof(ExitComponent),
+                typeof(CoinComponent)
+            );
 
             Observable.Interval(TimeSpan.FromSeconds(_gameConfiguration.IntroLength))
                 .First()
                 .Subscribe(x => levelComponent.HasLoaded.Value = true);
-            
+
             defaultCollection.CreateEntity(new GameBoardBlueprint());
 
             for (var i = 0; i < levelComponent.FoodCount; i++)
@@ -92,6 +95,9 @@ namespace Game
 
             for (var i = 0; i < levelComponent.EnemyCount; i++)
             { defaultCollection.CreateEntity(new EnemyBlueprint()); }
+
+            for (var i = 0; i < levelComponent.CoinCount; i++)
+            { defaultCollection.CreateEntity(new CoinBlueprint()); }
 
             defaultCollection.CreateEntity(new ExitBlueprint());
         }

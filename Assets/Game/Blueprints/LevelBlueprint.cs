@@ -32,6 +32,11 @@ namespace Game.Blueprints
             levelComponent.FoodCount = Random.Range(_minFood, _maxFood);
             levelComponent.WallCount = Random.Range(_minWalls, _maxWalls);
             levelComponent.Level.Value = level;
+
+            if (level > 1)
+            {
+                levelComponent.CoinCount = 2;
+            }
         }
     }
 }

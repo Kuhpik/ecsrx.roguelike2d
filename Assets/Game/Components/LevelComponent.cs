@@ -11,6 +11,7 @@ namespace Game.Components
         public int WallCount { get; set; }
         public int FoodCount { get; set; }
         public int EnemyCount { get; set; }
+        public int CoinCount { get; set; }
 
         public LevelComponent()
         {
